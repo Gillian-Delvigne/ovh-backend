@@ -6,11 +6,20 @@ router.get('/', function(req, res, next) {
     res.send('respond with a resource');
 });
 
+    /* get method for fetching all Training Sessions. */
+    router.get('/getTrainingSessions', function (req, res) {
+        var query = 'SELECT * FROM Training_Sessions LEFT JOIN Trainings as p ON Training_Sessions.training_session_id = p.training_id';
+        db.query(query, function (error, results, fields) {
+            if (error) throw error;
+            res.send(JSON.stringify(results));
+        });
+    });
+
 /* get method for fetching all Training Sessions By Training Id. */
 router.get('/getTrainingSessionByTId/:id', function (req, res) {
     var id = req.params.id;
     /*var query = 'Select ts.*,t.*, ts.training_session_id, count(p.training_session_id) as t_count from Trainings as t inner join Training_Sessions as ts ON ts.training_id=t.training_id left join Participants as p ON p.training_session_id = ts.training_session_id where t.category_id=' + id + 'group by ts.training_session_id';*/
-    var query = 'SELECT * FROM Training_Sessions INNER JOIN Location ON Training_Sessions.location_id = Location.location_id AND Training_Sessions.training_id='+id;
+    var query = 'SELECT *, Trainings.name as training_name, Location.name as loc_name FROM Training_Sessions INNER JOIN Location ON Training_Sessions.location_id = Location.location_id INNER JOIN Trainings ON Training_Sessions.training_id = Trainings.training_id AND Training_Sessions.training_id='+id;
     let data = [];
     db.query(query, function (error, results, fields) {
         if (error) throw error;
