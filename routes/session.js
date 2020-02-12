@@ -8,7 +8,24 @@ router.get('/', function(req, res, next) {
 
     /* get method for fetching all Training Sessions. */
     router.get('/getTrainingSessions', function (req, res) {
-        var query = 'SELECT * FROM Training_Sessions LEFT JOIN Trainings as p ON Training_Sessions.training_session_id = p.training_id';
+        var query = 'SELECT p.name as name,\n' +
+            '    p.description as description,\n' +
+            '    p.duration_info,\n' +
+            '    p.price,\n' +
+            '    p.participants_max as participants_max,\n' +
+            '    p.participants_min as participants_min,\n' +
+            '    p.contact_id,\n' +
+            '    p.category_id as category_id,\n' +
+            '    Training_Sessions.training_id AS training_id,\n' +
+            '    Training_Sessions.day1,\n' +
+            '    Training_Sessions.start_time1,\n' +
+            '    Training_Sessions.start_time2,\n' +
+            '    Training_Sessions.end_time1,\n' +
+            '    Training_Sessions.end_time2,\n' +
+            '    Training_Sessions.trainer1_id,\n' +
+            '    Training_Sessions.trainer2_id,\n' +
+            '    Training_Sessions.location_id,\n' +
+            '    Training_Sessions.training_session_id AS training_session_id FROM Training_Sessions JOIN Trainings as p ON Training_Sessions.training_session_id = p.training_id';
         db.query(query, function (error, results, fields) {
             if (error) throw error;
             res.send(JSON.stringify(results));
@@ -18,31 +35,41 @@ router.get('/', function(req, res, next) {
 /* get method for fetching all Training Sessions By Training Id. */
 router.get('/getTrainingSessionByTId/:id', function (req, res) {
     var id = req.params.id;
+    console.log('id', id);
     /*var query = 'Select ts.*,t.*, ts.training_session_id, count(p.training_session_id) as t_count from Trainings as t inner join Training_Sessions as ts ON ts.training_id=t.training_id left join Participants as p ON p.training_session_id = ts.training_session_id where t.category_id=' + id + 'group by ts.training_session_id';*/
     var query = 'SELECT *, Trainings.name as training_name, Location.name as loc_name FROM Training_Sessions INNER JOIN Location ON Training_Sessions.location_id = Location.location_id INNER JOIN Trainings ON Training_Sessions.training_id = Trainings.training_id AND Training_Sessions.training_id='+id;
     let data = [];
     db.query(query, function (error, results, fields) {
         if (error) throw error;
-        // console.log(results)training_session_id
+        console.log(results);
         var pending = results.length;
-        let count = 0;
-        results.forEach(element => {
-            // console.log('ele 1', element, element.training_session_id);
-            var queryP = 'SELECT COUNT(*) as count FROM Participants WHERE training_session_id ='+element.training_session_id;
-            db.query(queryP, function (err, ress, field) {
-                if (err) throw err;
-                console.log('2',ress[0])
-                element['count']= ress[0];
-                data.push(element);
-                // console.log(count, pending, data);
-                count++;
-                if(count == pending){
-                    console.log('asd',data)
-                    res.send(JSON.stringify(data));
-                }
+        if(pending){
+            let count = 0;
+            results.forEach(element => {
+                // console.log('ele 1', element, element.training_session_id);
+                var queryP = 'SELECT COUNT(*) as count FROM Participants WHERE training_session_id ='+element.training_session_id;
+                db.query(queryP, function (err, ress, field) {
+                    if (err) throw err;
+                    console.log('2',ress[0])
+                    element['count']= ress[0];
+                    data.push(element);
+                    // console.log(count, pending, data);
+                    count++;
+                    if(count == pending){
+                        console.log('asd',data)
+                        res.send(JSON.stringify(data));
+                    }
 
-            })
-        });
+                })
+            });
+        }else{
+            var errors = {
+                status: false,
+                message: 'No Session Found!!!'
+            };
+            res.end(JSON.stringify(errors));
+        }
+
         // if(count == pending){
         //     console.log('asd',data)
         // }
