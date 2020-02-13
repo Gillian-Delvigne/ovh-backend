@@ -57,7 +57,13 @@ router.get('/getTrainingSessionByTId/:id', function (req, res) {
                     count++;
                     if(count == pending){
                         console.log('asd',data)
-                        res.send(JSON.stringify(data));
+                        var succ = {
+                            status: true,
+                            message: 'Session Found!!!',
+                            data: data
+                        };
+                        res.end(JSON.stringify(succ));
+                        // res.send(JSON.stringify(data));
                     }
 
                 })
@@ -81,7 +87,7 @@ router.get('/getTrainingSessionByTId/:id', function (req, res) {
 /* get method for fetching Training Session By Id. */
 router.get('/getTrainingSessionByTSId/:id', function (req, res) {
     var id = req.params.id;
-    var query = 'SELECT * FROM Training_Sessions ' +
+    var query = 'SELECT *, Trainings.name as training_name, Location.name as loc_name FROM Training_Sessions ' +
         'INNER JOIN Location ON Training_Sessions.location_id = Location.location_id ' +
         'INNER JOIN Trainings ON Training_Sessions.training_id = Trainings.training_id ' +
         'WHERE Training_Sessions.training_session_id='+id;
