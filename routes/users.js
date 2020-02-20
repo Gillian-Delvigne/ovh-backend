@@ -15,14 +15,6 @@ router.get('/getUsers', function (req, res) {
   });
 });
 
-/* get User by Id. */
-router.get('/getUsers', function (req, res) {
-  db.query('select * from Users', function (error, results, fields) {
-    if (error) throw error;
-    res.end(JSON.stringify(results));
-  });
-});
-
 /* Login */
 router.post('/login', function (req, res) {
   var email = req.body.email;
@@ -94,6 +86,49 @@ router.post('/signUp', function (req, res) {
     }
 
     // console.log('Last record insert id:', result.insertId);
+  });
+});
+
+// Admin APIs
+
+/* Admin Login */
+router.post('/loginAdmin', function (req, res) {
+  var email = req.body.email;
+  var password = req.body.password;
+  var checkEmail = "SELECT * FROM Users where email = '"+email +"' AND password = '"+ password +"' AND role_id= '1'";
+  db.query(checkEmail, function(error,result){
+    if(error) throw error;
+    // console.log(result)
+    if(result.length){
+      var success = {
+        status: true,
+        message: 'User found!!!',
+        data: result
+      };
+      res.end(JSON.stringify(success));
+    }else{
+      var errors = {
+        status: false,
+        message: 'No user found with this email'
+      };
+      res.end(JSON.stringify(errors));
+    }
+  })
+});
+
+/* Users List*/
+router.get('/getUsersAdmin', function (req, res) {
+  db.query('select * from Users Where role_id != 1', function (error, results, fields) {
+    if (error) throw error;
+    res.end(JSON.stringify(results));
+  });
+});
+
+/* get User by Id. */
+router.get('/getUserById', function (req, res) {
+  db.query('select * from Users', function (error, results, fields) {
+    if (error) throw error;
+    res.end(JSON.stringify(results));
   });
 });
 
