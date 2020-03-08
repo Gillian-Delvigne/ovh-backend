@@ -184,4 +184,18 @@ router.get("/getParticipants", (req, res) => {
     });
 });
 
+/* get method for fetching all Training Sessions By Training Id. */
+router.get('/getTrainingSessionByAll', function (req, res) {
+    var query = 'SELECT * FROM `Training_Sessions` JOIN Trainings ON Training_Sessions.training_id = Trainings.training_id';
+    db.query(query, function(error, result){
+        if(error) throw error;
+
+        var datas = {
+            status: true,
+            data: result
+        }
+        res.send(JSON.stringify(datas));
+    });
+});
+
 module.exports = router;

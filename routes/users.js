@@ -41,15 +41,6 @@ router.post('/login', function (req, res) {
 })
 /* Signup */
 router.post('/signUp', function (req, res) {
-  // console.log('req', req);
-  var date = new Date();
-  /*let passwordHash = bcrypt.hashSync(req.body.password, 10);
-  console.log(passwordHash, 'hash');
-  if(bcrypt.compareSync('gosolar1', passwordHash)) {
-    console.log('matechjed');
-  } else {
-    console.log('didnt matched')
-  }*/
 
   var record = {'role_id':3, 'first_name': req.body.prenom, 'last_name': req.body.nom, 'gender': req.body.genre, 'date_of_birth': req.body.dob, 'email':req.body.email, 'phone_number':req.body.phone, 'matricule': req.body.matricule,
     'nationality': req.body.country, 'activity_type': req.body.typeActivity, 'activity': req.body.activity, 'general_entity': req.body.typeEntity, 'local_entity': req.body.entity, 'password': req.body.password}
@@ -141,7 +132,9 @@ router.post('/update', function (req, res) {
 
 /* get User by Id. */
 router.get('/getUserById', function (req, res) {
-  db.query('select * from Users', function (error, results, fields) {
+  var id = req.body.id;
+  var selQuery = "SELECT * FROM Users WHERE user_id = '" +id+"'";
+  db.query(selQuery, function (error, results, fields) {
     if (error) throw error;
     res.end(JSON.stringify(results));
   });
@@ -153,6 +146,15 @@ router.post('/deleteUserById', function (req, res) {
   var delQuery = "DELETE FROM Users WHERE user_id = '" +id+"'";
   console.log(delQuery);
   db.query(delQuery , function (error, results, fields) {
+    if (error) throw error;
+    res.end(JSON.stringify(results));
+  });
+});
+
+/* get Roles. */
+router.get('/getRoles', function (req, res) {
+  var selQuery = "SELECT * FROM Roles";
+  db.query(selQuery, function (error, results, fields) {
     if (error) throw error;
     res.end(JSON.stringify(results));
   });
