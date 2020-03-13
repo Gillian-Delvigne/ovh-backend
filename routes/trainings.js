@@ -41,47 +41,50 @@ router.get('/getTrainingsByCat/:id', function(req, res, next) {
     });
 });
 
+/* Delete Training by Id. */
+router.post('/deleteTrainingById', function (req, res) {
+    var id = req.body.id;
+    var delQuery = "DELETE FROM Trainings WHERE training_id = '" +id+"'";
+    console.log(delQuery);
+    db.query(delQuery , function (error, results, fields) {
+        if (error) throw error;
+        res.end(JSON.stringify(results));
+    });
+});
 
-/*post method for create product*/
-/*router.post('/create', function(req, res, next) {
-    var name = req.body.name;
-    var sku = req.body.sku;
-    var price = req.body.price;
+/*get method for fetching Training Contacts*/
+router.get('/getTrainingsContacts', function(req, res, next) {
+    var sql = 'SELECT * FROM Training_Contacts';
+    db.query(sql, function (error, results, fields) {
+        if (error) throw error;
+        res.send(JSON.stringify(results));
+    });
+});
 
-    var sql = `INSERT INTO products (name, sku, price, active, created_at) VALUES ("${name}", "${sku}", "${price}", 1, NOW())`;
-    db.query(sql, function(err, result) {
-        if(err) {
-            res.status(500).send({ error: 'Something failed!' })
+router.post('/addTraining', function (req, res) {
+
+    var record = {'name': req.body.name, 'description': req.body.description, 'duration_info': req.body.duration, 'price': req.body.price, 'participants_min':req.body.participantsMin, 'participants_max':req.body.participantsMax, 'conditions': req.body.conditions,
+        'is_required': req.body.isRequired, 'category_id': req.body.categoryId, 'contact_id': req.body.trainingContactId, 'image_url': ''}
+    console.log(record);
+    db.query('INSERT INTO Trainings SET ?', record, function(error, result1){
+        if(error) throw error;
+        console.log(result1);
+        // var getUser = "SELECT * FROM Users where user_id = '"+result1.insertId +"'";
+        if(result1.affectedRows == 1){
+            var datas = {
+                status: true,
+                data: 'Record Added'
+            }
+        }else{
+            var datas = {
+                status: false,
+                data: 'No Records'
+            }
         }
-        res.json({'status': 'success', id: result.insertId})
-    })
-});*/
 
-/*put method for update product*/
-/*router.put('/update/:id', function(req, res, next) {
-    var id = req.params.id;
-    var name = req.body.name;
-    var sku = req.body.sku;
-    var price = req.body.price;
+        res.end(JSON.stringify(datas))
 
-    var sql = `UPDATE products SET name="${name}", sku="${sku}", price="${price}" WHERE id=${id}`;
-    db.query(sql, function(err, result) {
-        if(err) {
-            res.status(500).send({ error: 'Something failed!' })
-        }
-        res.json({'status': 'success'})
-    })
-});*/
-
-/*delete method for delete product*/
-/*router.delete('/delete/:id', function(req, res, next) {
-    var id = req.params.id;
-    var sql = `DELETE FROM products WHERE id=${id}`;
-    db.query(sql, function(err, result) {
-        if(err) {
-            res.status(500).send({ error: 'Something failed!' })
-        }
-        res.json({'status': 'success'})
-    })
-})*/
+        // console.log('Last record insert id:', result.insertId);
+    });
+});
 module.exports = router;
