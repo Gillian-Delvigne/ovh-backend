@@ -87,4 +87,39 @@ router.post('/addTraining', function (req, res) {
         // console.log('Last record insert id:', result.insertId);
     });
 });
+
+router.post('/editTraining', function (req, res) {
+
+    var updateQuery = "UPDATE Trainings SET name='"+req.body.name+"', description='"+req.body.description+"', duration_info='"+req.body.duration+"', price='"+req.body.price+"', participants_min='"+req.body.participantsMin+"', participants_max='"+req.body.participantsMax+"', conditions='"+req.body.conditions+"', is_required='"+req.body.isRequired+"', category_id='"+req.body.categoryId+"', contact_id='"+req.body.trainingContactId+"' WHERE training_id='"+req.body.trainingId+"'";
+
+    console.log(updateQuery);
+
+    db.query(updateQuery, function(error, result1){
+        if(error) throw error;
+        console.log('results',result1);
+        res.end(JSON.stringify(result1));
+
+    });
+});
+
+/*get method for fetch single Training Contact*/
+router.get('/getTrainingContacts/:id', function(req, res, next) {
+    var id = req.params.id;
+    var sql = 'SELECT * FROM Training_Contacts WHERE training_contact_id='+id;
+    db.query(sql, function(error, results, field) {
+        if (error) throw error;
+        res.send(JSON.stringify(results));
+    })
+});
+
+/*Fetch Training Contact*/
+router.get('/getTrainingContacts', function(req, res, next) {
+    var id = req.params.id;
+    var sql = 'SELECT * FROM Training_Contacts';
+    db.query(sql, function(error, results, field) {
+        if (error) throw error;
+        res.send(JSON.stringify(results));
+    })
+});
+
 module.exports = router;

@@ -14,4 +14,13 @@ router.get('/getLocations', function (req, res) {
     });
 });
 
+/*get method for fetch single Training Contact*/
+router.get('/getLocationById/:id', function(req, res, next) {
+    var id = req.params.id;
+    var sql = 'SELECT * FROM Location WHERE location_id='+id;
+    db.query(sql, function(error, results, field) {
+        if (error) throw error;
+        res.send(JSON.stringify(results));
+    })
+});
 module.exports = router;
