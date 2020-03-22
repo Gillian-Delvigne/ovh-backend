@@ -122,4 +122,57 @@ router.get('/getTrainingContacts', function(req, res, next) {
     })
 });
 
+/*Add Contact*/
+router.post('/addContact', function (req, res) {
+
+    var record = {'contact_name': req.body.contact_name, 'email': req.body.email, 'phone': req.body.phone}
+    console.log(record);
+    db.query('INSERT INTO Training_Contacts SET ?', record, function(error, result1){
+        if(error) throw error;
+        console.log(result1);
+        // var getUser = "SELECT * FROM Users where user_id = '"+result1.insertId +"'";
+        if(result1.affectedRows == 1){
+            var datas = {
+                status: true,
+                data: 'Record Added'
+            }
+        }else{
+            var datas = {
+                status: false,
+                data: 'No Records'
+            }
+        }
+
+        res.end(JSON.stringify(datas))
+
+        // console.log('Last record insert id:', result.insertId);
+    });
+});
+
+/* Edit Contact*/
+router.post('/editContact', function (req, res) {
+
+    var updateQuery = "UPDATE Training_Contacts SET contact_name='"+req.body.contact_name+"', phone='"+req.body.phone+"', email='"+req.body.email+"' WHERE training_contact_id='"+req.body.training_contact_id+"'";
+
+    console.log(updateQuery);
+
+    db.query(updateQuery, function(error, result1){
+        if(error) throw error;
+        console.log('results',result1);
+        res.end(JSON.stringify(result1));
+
+    });
+});
+
+/* Delete COntact*/
+router.post('/deleteContact', function (req, res) {
+    var id = req.body.id;
+    var delQuery = "DELETE FROM Training_Contacts WHERE training_contact_id = '" +id+"'";
+    console.log(delQuery);
+    db.query(delQuery , function (error, results, fields) {
+        if (error) throw error;
+        res.end(JSON.stringify(results));
+    });
+});
+
 module.exports = router;
