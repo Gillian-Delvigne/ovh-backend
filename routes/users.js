@@ -160,4 +160,13 @@ router.get('/getRoles', function (req, res) {
   });
 });
 
+/* get Roles. */
+router.get('/getTrainers', function (req, res) {
+  var selQuery = "SELECT user_id, first_name, last_name, email FROM Users WHERE role_id = 3";
+  db.query(selQuery, function (error, results, fields) {
+    if (error) throw error;
+    res.end(JSON.stringify(results));
+  });
+});
+
 module.exports = router;

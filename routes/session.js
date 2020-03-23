@@ -198,4 +198,62 @@ router.get('/getTrainingSessionByAll', function (req, res) {
     });
 });
 
+// Add Session
+router.post('/addTrainingSession', function (req, res) {
+
+    var record = {'day1': req.body.day1, 'start_time1': req.body.start_time1, 'end_time1': req.body.end_time1, 'day2': req.body.day2 ? req.body.day2 : null, 'start_time2':req.body.start_time2, 'end_time2':req.body.end_time2, 'training_id': req.body.training_id,
+        'trainer1_id': req.body.trainer1_id, 'trainer2_id': req.body.trainer2_id ? Number(req.body.trainer2_id) : null, 'location_id': req.body.location_id ? Number(req.body.location_id) : null}
+    console.log(record);
+    db.query('INSERT INTO Training_Sessions SET ?', record, function(error, result1){
+        if(error) throw error;
+        console.log(result1);
+        // var getUser = "SELECT * FROM Users where user_id = '"+result1.insertId +"'";
+        if(result1.affectedRows == 1){
+            var datas = {
+                status: true,
+                data: 'Record Added'
+            }
+        }else{
+            var datas = {
+                status: false,
+                data: 'No Records'
+            }
+        }
+
+        res.end(JSON.stringify(datas))
+
+        // console.log('Last record insert id:', result.insertId);
+    });
+});
+
+/* Delete Session */
+router.post('/deleteSession', function (req, res) {
+    var id = req.body.id;
+    var delQuery = "DELETE FROM Training_Sessions WHERE training_session_id = '" +id+"'";
+    console.log(delQuery);
+    db.query(delQuery , function (error, results, fields) {
+        if (error) throw error;
+        res.end(JSON.stringify(results));
+    });
+});
+
+/* Edit Session */
+router.post('/editSession', function (req, res) {
+    console.log('req.body', req.body)
+    var day2 = req.body.day2 ? req.body.day2 : null;
+    var trainer2_id = req.body.trainer2_id ? Number(req.body.trainer2_id) : null;
+    var location_id = req.body.location_id ? Number(req.body.location_id) : null;
+
+    var updateQuery = "UPDATE Training_Sessions SET day1='"+req.body.day1+"', start_time1='"+req.body.start_time1+"', end_time1='"+req.body.end_time1+"', day2="+day2+", start_time2='"+req.body.start_time2+"', end_time2='"+req.body.end_time2+"', training_id='"+req.body.training_id+"', trainer1_id='"+req.body.trainer1_id+"', trainer2_id="+trainer2_id+", location_id="+location_id+" WHERE training_session_id='"+req.body.training_session_id+"'";
+
+    console.log(updateQuery);
+
+    db.query(updateQuery, function(error, result1){
+        if(error) throw error;
+        console.log('results',result1);
+        res.end(JSON.stringify(result1));
+
+    });
+});
+
 module.exports = router;
