@@ -131,8 +131,9 @@ router.post('/update', function (req, res) {
 });
 
 /* get User by Id. */
-router.get('/getUserById', function (req, res) {
-  var id = req.body.id;
+router.get('/getUserById/:id', function (req, res) {
+  var id = req.params.id;
+  console.log(id)
   var selQuery = "SELECT * FROM Users WHERE user_id = '" +id+"'";
   db.query(selQuery, function (error, results, fields) {
     if (error) throw error;
@@ -151,6 +152,7 @@ router.post('/deleteUserById', function (req, res) {
   });
 });
 
+/* Roles APIs */
 /* get Roles. */
 router.get('/getRoles', function (req, res) {
   var selQuery = "SELECT * FROM Roles";
@@ -160,13 +162,131 @@ router.get('/getRoles', function (req, res) {
   });
 });
 
-/* get Roles. */
+/* add Roles. */
+router.post('/addRoles', function (req, res) {
+
+  var record = {'name': req.body.name}
+  console.log(record);
+  db.query('INSERT INTO Roles SET ?', record, function(error, result1){
+    if(error) throw error;
+    console.log(result1);
+    if(result1.affectedRows == 1){
+      var datas = {
+        status: true,
+        data: 'Record Added'
+      }
+    }else{
+      var datas = {
+        status: false,
+        data: 'No Records'
+      }
+    }
+
+    res.end(JSON.stringify(datas))
+
+    // console.log('Last record insert id:', result.insertId);
+  });
+});
+
+/* Delete Role */
+router.post('/deleteRole', function (req, res) {
+  var id = req.body.id;
+  var delQuery = "DELETE FROM Roles WHERE role_id = '" +id+"'";
+  console.log(delQuery);
+  db.query(delQuery , function (error, results, fields) {
+    if (error) throw error;
+    res.end(JSON.stringify(results));
+  });
+});
+
+/* Edit Role */
+router.post('/editRole', function (req, res) {
+  console.log('req.body', req.body)
+
+
+  var updateQuery = "UPDATE Roles SET name='"+req.body.name+ "' WHERE role_id='"+req.body.role_id+"'";
+
+  console.log(updateQuery);
+
+  db.query(updateQuery, function(error, result1){
+    if(error) throw error;
+    console.log('results',result1);
+    res.end(JSON.stringify(result1));
+
+  });
+});
+
+/* get Trainers. */
 router.get('/getTrainers', function (req, res) {
   var selQuery = "SELECT user_id, first_name, last_name, email FROM Users WHERE role_id = 3";
   db.query(selQuery, function (error, results, fields) {
     if (error) throw error;
     res.end(JSON.stringify(results));
   });
+});
+
+/* Status APIs */
+/* get Status. */
+router.get('/getStatus', function (req, res) {
+    var selQuery = "SELECT * FROM Status";
+    db.query(selQuery, function (error, results, fields) {
+        if (error) throw error;
+        res.end(JSON.stringify(results));
+    });
+});
+
+/* add Status */
+router.post('/addStatus', function (req, res) {
+
+    var record = {'name': req.body.name}
+    console.log(record);
+    db.query('INSERT INTO Status SET ?', record, function(error, result1){
+        if(error) throw error;
+        console.log(result1);
+        if(result1.affectedRows == 1){
+            var datas = {
+                status: true,
+                data: 'Record Added'
+            }
+        }else{
+            var datas = {
+                status: false,
+                data: 'No Records'
+            }
+        }
+
+        res.end(JSON.stringify(datas))
+
+        // console.log('Last record insert id:', result.insertId);
+    });
+});
+
+/* Delete Status */
+router.post('/deleteStatus', function (req, res) {
+    var id = req.body.id;
+    var delQuery = "DELETE FROM Status WHERE status_id = '" +id+"'";
+    console.log(delQuery);
+    db.query(delQuery , function (error, results, fields) {
+        if (error) throw error;
+        res.end(JSON.stringify(results));
+    });
+});
+
+/* Edit Status */
+router.post('/editStatus', function (req, res) {
+    console.log('req.body', req.body)
+
+
+    var updateQuery = "UPDATE Status SET name='"+req.body.name+ "' WHERE status_id='"+req.body.status_id+"'";
+
+    console.log(updateQuery);
+
+    db.query(updateQuery, function(error, result1){
+        if(error) throw error;
+        console.log('results',result1);
+        res.end(JSON.stringify(result1));
+
+    });
 });
 
 module.exports = router;
