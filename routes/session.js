@@ -137,7 +137,7 @@ router.post("/addParticipant", (req, res) => {
     var record = {
         user_id : req.body.userId,
         training_session_id: req.body.sessionId,
-        status_id: '1'
+        status_id: req.body.status_id ? req.body.status_id : '1'
     };
     console.log(record);
     const quer = 'SELECT * FROM training.Participants WHERE user_id = '+ req.body.userId +' AND training_session_id = '+req.body.sessionId;
@@ -152,6 +152,7 @@ router.post("/addParticipant", (req, res) => {
             };
             res.end(JSON.stringify(success));
         }else{
+
             db.query('INSERT INTO Participants SET ?', record, function(error, result){
                 if(error) throw error;
 
@@ -245,6 +246,45 @@ router.post('/editSession', function (req, res) {
     var location_id = req.body.location_id ? Number(req.body.location_id) : null;
 
     var updateQuery = "UPDATE Training_Sessions SET day1='"+req.body.day1+"', start_time1='"+req.body.start_time1+"', end_time1='"+req.body.end_time1+"', day2="+day2+", start_time2='"+req.body.start_time2+"', end_time2='"+req.body.end_time2+"', training_id='"+req.body.training_id+"', trainer1_id='"+req.body.trainer1_id+"', trainer2_id="+trainer2_id+", location_id="+location_id+" WHERE training_session_id='"+req.body.training_session_id+"'";
+
+    console.log(updateQuery);
+
+    db.query(updateQuery, function(error, result1){
+        if(error) throw error;
+        console.log('results',result1);
+        res.end(JSON.stringify(result1));
+
+    });
+});
+
+/* get method for Sessions Participants. */
+router.get('/getSessionParticipants/:id', function (req, res) {
+    var id = req.params.id;
+    var query = 'SELECT Participants.*, Users.first_name, Users.last_name, Users.email, Users.phone_number, Status.name as status_name  FROM Participants LEFT JOIN Users ON Participants.user_id = Users.user_id Join Status ON Participants.status_id = Status.status_id WHERE Participants.training_session_id =' + id + ' AND Users.user_id IS NOT NULL';
+    console.log(query);
+    db.query(query, function (error, results, fields) {
+        if (error) throw error;
+        res.send(JSON.stringify(results));
+    });
+});
+
+/* Delete Participant */
+router.post('/deleteParticipant', function (req, res) {
+    var id = req.body.id;
+    var delQuery = "DELETE FROM Participants WHERE participant_id = '" +id+"'";
+    console.log(delQuery);
+    db.query(delQuery , function (error, results, fields) {
+        if (error) throw error;
+        res.end(JSON.stringify(results));
+    });
+});
+
+
+/* Edit Session */
+router.post('/editParticipant', function (req, res) {
+    console.log('req.body', req.body)
+
+    var updateQuery = "UPDATE Participants SET user_id='"+req.body.user_id+"', training_session_id='"+req.body.training_session_id+"', status_id='"+req.body.status_id+"' WHERE participant_id='"+req.body.participant_id+"'";
 
     console.log(updateQuery);
 
